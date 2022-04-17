@@ -21,7 +21,9 @@ function createUserDB(user, pass, name, lname) {
             password: pass,
             firstname: name,
             lastname: lname,
-            unlocked_themes: [], 
+            unlocked_themes: [],
+            strengths: [],
+            weaknesses: [], 
             credits: 0
         }
         dbo.collection("users").insertOne(sampleUser, function(err, res) {
@@ -54,7 +56,9 @@ async function checkUser(u, p, response) {
                     firstname: res.firstname,
                     lastname: res.lastname,
                     credits: res.credits,
-                    unlocked_themes: res.unlocked_themes
+                    unlocked_themes: res.unlocked_themes,
+                    strengths: res.strengths,
+                    weaknesses: res.weaknesses,
                 }
             }
             response.status(200).send(JSON.stringify(temp))
@@ -113,25 +117,7 @@ app.post('/login', jsonParser, function(req, res) {
     checkUser(req.body.email_in, req.body.password_in, res);
 })
 
-// async function findQuestion(t, response) {
-//     await client.connect(err => {
-//         var dbo = client.db("eTutor");
-//         dbo.collection("questions").aggregate({$match : {topic: t}}, {$sample: }, function(err, res) {
-//             if (err) throw err;
-//             if (res == null || res == undefined) {
-//                 console.log("no such questions");
-//             } else {
-//                 console.log("questions found");
-//             }
-//             response.status(200).send(JSON.stringify(res))
-//             client.close();
-//         });
-//     })
-// }
-
-
-
-async function findQuestionTest(t, response) {
+async function findQuestion(t, response) {
     await client.connect(err => {
         client.db("eTutor").collection("questions").find({topic:t}).toArray(function(err, res) {
             if (err) throw err;
@@ -149,7 +135,7 @@ async function findQuestionTest(t, response) {
 
 app.post('/module', jsonParser, function(req, res) { 
     console.log(req.body.topic);
-    findQuestionTest(req.body.topic, res)
+    findQuestion(req.body.topic, res)
 })
 
 

@@ -5,7 +5,7 @@ function sendQuestion() {
         return;
     }
     //unauthorized user
-    if(JSON.parse(sessionStorage.getItem('user')).email != null) {
+    if(JSON.parse(sessionStorage.getItem('user')).email != "andrew.hua@ucc.on.ca") {
         document.getElementById('unauthorized').style.display = 'block';
         console.log("hello");
         return;

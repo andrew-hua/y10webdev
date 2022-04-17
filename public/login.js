@@ -37,8 +37,10 @@ function loginresult(val) {
       firstname: val.firstname,
       lastname: val.lastname,
       credits: val.credits,
-      email: val.username,
-      unlocked_themes: val.unlocked_themes
+      email: val.email,
+      unlocked_themes: val.unlocked_themes,
+      strengths: val.strengths,
+      weaknesses: val.weaknesses,
     }
     sessionStorage.setItem('user', JSON.stringify(userData));
   } else {
