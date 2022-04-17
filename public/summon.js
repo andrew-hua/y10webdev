@@ -92,7 +92,8 @@ function userLogout(){
 
 
 function checkUnderstanding() {
-
+    document.cookie = document.getElementById("topicName").innerHTML;
+    window.location.replace("exercisemodule.html");
 }
 
 function nextLesson() {

@@ -1,66 +1,3 @@
-
-class exercise {
-  constructor(question, solution) {
-    this.question = question;
-    this.solution = solution;
-    this.successCount = 0;
-    this.failureCount = 0;
-  }
-
-  getSuccessRate() {
-    if (this.failureCount == 0) {
-      return;
-    }
-    return this.successCount / (this.successCount + this.failureCount);
-  }
-}
-
-// easy arithmetic class of questions
-class arithmeticEasy extends exercise {
-  constructor(a, b, operation) {
-    this.a = a;
-    this.b = b;
-  }
-
-  formula() {
-    if (operation == '*') {
-      return this.a * this.b;
-    } else if (operation == '+') {
-      return this.a + this.b;
-    } else if (operation == '-') {
-      return this.a - this.b;
-    } else if (operation == '/') {
-      return this.a / this.b;
-    }
-  }
-
-  checkAnswer(result) {
-    if (result == this.formula()) {
-      this.successCount = this.successCount + 1;
-      return true;
-    }
-    this.failureCount = this.failureCount + 1;
-    return false;
-  }
-}
-
-var sampleQuestion = new exercise(
-  "This is a sample question",
-  "This is a sample answer"
-)
-
-function getQuestion() {
-
-}
-
-// function appendQuestion() {
-//   let questionContainer = document.getElementById("questionContainer");
-//   let newQuestion = document.createElement("div");
-//   newQuestion.innerHTML = sampleQuestion.question;
-//   questionContainer.appendChild(newQuestion);
-// }
-
-
 function checkAnswer() { //function initiated when user presses submit button
   document.getElementById('answerBox').disabled = true;
   document.getElementById('submitButton').disabled = true;
@@ -71,7 +8,7 @@ function checkAnswer() { //function initiated when user presses submit button
   document.getElementById("failure").style.display = "none";
   document.getElementById("giveup").style.display = "none";
   guess = document.getElementById("answerBox").value; //take user input
-  answer = 2; // this is the correct answer
+  answer = questionAnswer; // this is the correct answer
   if (guess == answer) { // if the user's input is correct display the correct message
     document.getElementById("success").style.display = "block"; //display success message
     updateCredits(300);
@@ -104,8 +41,15 @@ function summonPage(content) {
   document.cookie = content;
 }
 
+function displayContent() {
+  let topic = document.cookie;
+  console.log(topic);
+  document.getElementById("topicHeader").innerHTML = topic;
+  document.cookie = "";
+  nextQuestion(topic);
+}
 
-function updateCredits(newCredits){
+function updateCredits(newCredits) {
   //update session storage
   let userData = JSON.parse(sessionStorage.getItem('user'));
   userData.credits = userData.credits + newCredits;
@@ -129,15 +73,33 @@ function nextQuestion(value) {
   fetch(url, {
     method: 'POST',
     body: JSON.stringify(temp),
-    headers: {"Content-type": "application/json"}
+    headers: { "Content-type": "application/json" }
   }).then(response => response.json())
-  .then(data => displayQuestion(data))
+    .then(data => displayQuestion(data))
 }
 
-function displayQuestion(val){
+
+let isFirstTime = true;
+var a = 0;
+function displayQuestion(val) {
   //assume that there will always be questions available
   console.log(val);
-  var a = val[Math.floor(Math.random() * val.length)];
+  if (isFirstTime) {
+    var a = val[Math.floor(Math.random() * val.length)];
+    isFirstTime = false;
+    console.log(a);
+  }
+  else {
+    var a = val[Math.floor(Math.random() * val.length)];
+    console.log(a);
+    while (a.question == document.getElementById("questionQuestion").innerHTML) {
+      a = val[Math.floor(Math.random() * val.length)];
+      console.log(a);
+    }
+  }
+  questionAnswer = a.answer;
+
+  //clean up and change question
   document.getElementById("questionTitle").innerHTML = a.title;
   document.getElementById("questionQuestion").innerHTML = a.question;
   document.getElementById("questionSolution").innerHTML = a.solution;
@@ -155,7 +117,9 @@ function displayQuestion(val){
 
 
 
-document.getElementById("nextQuestion").addEventListener("click", function(e) { 
-  nextQuestion("Integers");
+document.getElementById("nextQuestion").addEventListener("click", function (e) {
+  let topic = document.cookie;
+  document.cookie = "";
+  nextQuestion(topic);
 
 })

@@ -3,9 +3,10 @@ function getUserData() {
     if (sessionStorage.getItem('user') != null) {
         console.log(sessionStorage.getItem('user'));
         var myUser = JSON.parse(sessionStorage.getItem('user'));
-        document.getElementById("name").innerHTML = "First Name: " + myUser.firstname;
-        document.getElementById("lname").innerHTML = "Last Name: " + myUser.lastname;
+        document.getElementById("name").innerHTML = myUser.firstname + ' ' + myUser.lastname;
         document.getElementById("credits").innerHTML = "Credits: " + myUser.credits;
+    } else {
+        document.getElementById("signInWarning").style.display = 'block';
     }
 }
 
@@ -40,6 +41,7 @@ function userLogout() {
     document.getElementById('logout').style.display = 'none';
     document.getElementById('welcome').style.display = 'none';
     document.getElementById('welcome').innerHTML = "";
+    location.reload();
 }
 
 getUserData()
