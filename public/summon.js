@@ -67,20 +67,27 @@ function confirmUser(){
         document.getElementById('signup').style.display = 'none';
         document.getElementById('login').style.display = 'none';
         document.getElementById('logout').style.display = 'block';
+        
+        var myUser = JSON.parse(sessionStorage.getItem('user'));
+        var fname = myUser.firstname;
+
+        document.getElementById('welcome').innerHTML = "Welcome, " + fname;
+        document.getElementById('welcome').style.display = 'inline';
     } else {
         document.getElementById('signup').style.display = 'inline';
         document.getElementById('login').style.display = 'inline';
         document.getElementById('logout').style.display = 'none';
+        document.getElementById('welcome').style.display = 'none';
+        document.getElementById('welcome').innerHTML = "";
     }
 }
-
-confirmUser();
-
 function userLogout(){
     sessionStorage.clear();
-    document.getElementById('signup').style.display = 'block';
-    document.getElementById('login').style.display = 'block';
+    document.getElementById('signup').style.display = 'inline';
+    document.getElementById('login').style.display = 'inline';
     document.getElementById('logout').style.display = 'none';
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('welcome').innerHTML = "";
 }
 
 
@@ -104,10 +111,6 @@ function getData() {
     const url = 'http://localhost:8081/home'
     http.open("GET", url)
     http.send();
-
-    http.onreadystatechange=(e)=> {
-        console.log(http.responseText)
-    }
 }
 
 //runs when the page is opened

@@ -4,8 +4,8 @@
     max-width:100%;
 }
 
-
 .container-master {
+    min-width:1000px;
     display: flex;
     justify-content: center;
     width: 100vw;
@@ -29,4 +29,8 @@
 #image-container {
     width:100%;
     height:200px;
+}
+
+#makeBig {
+    min-width:1300px;
 }

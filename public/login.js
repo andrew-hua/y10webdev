@@ -1,31 +1,31 @@
 var userData = {};
 
-function loginUsers() {
-    const http = new XMLHttpRequest();
-    const url = "http://localhost:8081/login"
-    var email = document.getElementById("userEmail").value;
-    var password = document.getElementById("userPassword").value;
+// function loginUsers() {
+//     const http = new XMLHttpRequest();
+//     const url = "http://localhost:8081/login"
+//     var email = document.getElementById("userEmail").value;
+//     var password = document.getElementById("userPassword").value;
   
-    var User = {
-      email_in: email, 
-      password_in: password,
-    }
+//     var User = {
+//       email_in: email, 
+//       password_in: password,
+//     }
   
-    http.open("POST", url, true);
-    http.setRequestHeader('Content-Type', 'application/json');
-    http.send(JSON.stringify(User));
-  }
+//     http.open("POST", url, true);
+//     http.setRequestHeader('Content-Type', 'application/json');
+//     http.send(JSON.stringify(User));
+//   }
 
-  function getData() {
-    const http = new XMLHttpRequest();
-    const url = 'http://localhost:8081/verify'
-    http.open("GET", url)
-    http.send();
+//   function getData() {
+//     const http = new XMLHttpRequest();
+//     const url = 'http://localhost:8081/verify'
+//     http.open("GET", url)
+//     http.send();
 
-    http.onreadystatechange=(e)=> {
-        console.log(http.responseText)
-    }
-}
+//     http.onreadystatechange=(e)=> {
+//         console.log(http.responseText)
+//     }
+// }
 
 
 function loginresult(val) { 
@@ -59,12 +59,11 @@ function loginresult(val) {
       method: 'POST',
       body: JSON.stringify(User),
       headers: {"Content-type": "application/json"}
-    }).then(response => response.json()).then(data => loginresult(data))
+    }).then(response => response.json())
+    .then(data => loginresult(data))
   }
 
 
 document.getElementById("button-submit").addEventListener("click", function(e) { 
   loginUser();
 })
-  
-export {userData}
