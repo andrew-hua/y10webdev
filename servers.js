@@ -32,9 +32,9 @@ function createUserDB(user, pass, name, lname) {
     })
 }
 
-function checker() {
-    userResult.found = false;
-}
+// function checker() {
+//     userResult.found = false;
+// }
 
 // find user in database
 async function checkUser(u, p, response) {
@@ -63,23 +63,23 @@ async function checkUser(u, p, response) {
     })
 }
 
-async function findUser(u, p) {
-    await client.connect(err => {
-        var dbo = client.db("eTutor");
-        dbo.collection("users").findOne({credentials: u + ":" + p}, function(err, res) {
-            if (err) throw err;
-            console.log(res);
-            if (res == null || res == undefined) {
-                console.log("user not found");
-                userResult.found = false;
-            } else {
-                userResult.found = true;
-                console.log("user found");
-            }
-             client.close();
-        });
-    })
-}
+// async function findUser(u, p) {
+//     await client.connect(err => {
+//         var dbo = client.db("eTutor");
+//         dbo.collection("users").findOne({credentials: u + ":" + p}, function(err, res) {
+//             if (err) throw err;
+//             console.log(res);
+//             if (res == null || res == undefined) {
+//                 console.log("user not found");
+//                 userResult.found = false;
+//             } else {
+//                 userResult.found = true;
+//                 console.log("user found");
+//             }
+//              client.close();
+//         });
+//     })
+// }
 
 
 
@@ -96,15 +96,11 @@ app.get('/verify', function (req, res) {
     res.send(JSON.stringify(userResult));
 })
 
-app.get('/home', function(req, res){
-    let sample = {apple : "orange"}
-    res.send(sample)
-})
 
-app.post('/create-question', function(req, res) {
-    let temp = JSON.parse(req.body);
-    // send temp to Mango 
-    // CRUD
+app.post('/addquestion', jsonParser, function(req, res) {
+    console.log(req.body);
+    createQuestion(req.body.topic, req.body.title, req.body.question, req.body.answer, req.body.solution);
+
 });
 
 app.post('/signup', jsonParser, function(req, res) {
@@ -117,6 +113,45 @@ app.post('/login', jsonParser, function(req, res) {
     checkUser(req.body.email_in, req.body.password_in, res);
 })
 
+// async function findQuestion(t, response) {
+//     await client.connect(err => {
+//         var dbo = client.db("eTutor");
+//         dbo.collection("questions").aggregate({$match : {topic: t}}, {$sample: }, function(err, res) {
+//             if (err) throw err;
+//             if (res == null || res == undefined) {
+//                 console.log("no such questions");
+//             } else {
+//                 console.log("questions found");
+//             }
+//             response.status(200).send(JSON.stringify(res))
+//             client.close();
+//         });
+//     })
+// }
+
+
+
+async function findQuestionTest(t, response) {
+    await client.connect(err => {
+        client.db("eTutor").collection("questions").find({topic:t}).toArray(function(err, res) {
+            if (err) throw err;
+            if (res == null || res == undefined) {
+                console.log("no such questions");
+            } else {
+                console.log("questions found");
+                console.log(res);
+            }
+            response.status(200).send(JSON.stringify(res))
+            client.close();
+        });
+    })
+}
+
+app.post('/module', jsonParser, function(req, res) { 
+    console.log(req.body.topic);
+    findQuestionTest(req.body.topic, res)
+})
+
 
 var server = app.listen(8081, function () {
     var host = server.address().address
@@ -124,3 +159,37 @@ var server = app.listen(8081, function () {
     console.log(server.address().address)
  })
 
+app.post('/exercisemodule', jsonParser, function(req,res){
+    console.log(req.body);
+    updateUserCredits(req.body.email, req.body.credits);
+})
+
+function updateUserCredits(email, credits) {
+    client.connect(err => {
+        var dbo = client.db("eTutor");
+        dbo.collection("users").updateOne({email: email}, {$set: {credits: credits}}, function(err, res) {
+            if (err) throw err;
+            console.log("user credits updated");
+            client.close();
+        });
+    })
+}
+
+
+function createQuestion(topic, title, question, answer, solution) {
+    client.connect(err => {
+        var dbo = client.db("eTutor");
+        var sampleQuestion = {
+            topic: topic,
+            title: title,
+            question: question,
+            answer: answer,
+            solution: solution,
+        }
+        dbo.collection("questions").insertOne(sampleQuestion, function(err, res) {
+            if (err) throw err;
+            console.log("question submitted");
+            client.close();
+        });
+    })
+}
