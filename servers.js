@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
 
+
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://user1:user1@cluster0.57irp.mongodb.net/cluster0?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -22,8 +23,7 @@ function createUserDB(user, pass, name, lname) {
             firstname: name,
             lastname: lname,
             unlocked_themes: [],
-            strengths: [],
-            weaknesses: [], 
+            skill_list: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
             credits: 0
         }
         dbo.collection("users").insertOne(sampleUser, function(err, res) {
@@ -57,8 +57,7 @@ async function checkUser(u, p, response) {
                     lastname: res.lastname,
                     credits: res.credits,
                     unlocked_themes: res.unlocked_themes,
-                    strengths: res.strengths,
-                    weaknesses: res.weaknesses,
+                    skill_list: res.skill_list,
                 }
             }
             response.status(200).send(JSON.stringify(temp))
@@ -138,6 +137,17 @@ app.post('/module', jsonParser, function(req, res) {
     findQuestion(req.body.topic, res)
 })
 
+app.post('/addskill', jsonParser, function(req,res){
+    console.log(req.body);
+    addTopicSkill(req.body.email, req.body.topic_index);
+
+})
+
+app.post('/subskill', jsonParser, function(req,res){
+    console.log(req.body);
+    subTopicSkill(req.body.email, req.body.topic_index);
+
+})
 
 var server = app.listen(8081, function () {
     var host = server.address().address
@@ -160,7 +170,27 @@ function updateUserCredits(email, credits) {
         });
     })
 }
+async function addTopicSkill(email, skill_list) {
+    await client.connect(err => {
+        var dbo = client.db("eTutor");
+        dbo.collection("users").updateOne({email: email}, {$set: {skill_list: skill_list}}, function(err, res) {
+            if (err) throw err;
+            console.log("added to user skill");
+            client.close();
+        });
+    })
+}
 
+async function subTopicSkill(email, skill_list) {
+    await client.connect(err => {
+        var dbo = client.db("eTutor");
+        dbo.collection("users").updateOne({email: email}, {$set: {skill_list: skill_list}}, function(err, res) {
+            if (err) throw err;
+            console.log("added to user skill");
+            client.close();
+        });
+    })
+}
 
 function createQuestion(topic, title, question, answer, solution) {
     client.connect(err => {

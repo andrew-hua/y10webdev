@@ -39,8 +39,7 @@ function loginresult(val) {
       credits: val.credits,
       email: val.email,
       unlocked_themes: val.unlocked_themes,
-      strengths: val.strengths,
-      weaknesses: val.weaknesses,
+      skill_list: val.skill_list,
     }
     sessionStorage.setItem('user', JSON.stringify(userData));
   } else {
