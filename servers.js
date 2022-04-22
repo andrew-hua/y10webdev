@@ -14,17 +14,17 @@ var userResult = {
 }
 
 // used once to create a sample user
-function createUserDB(user, pass, name, lname) {
+function createUserDB(email, pass, name, lname) {
     client.connect(err => {
         var dbo = client.db("eTutor");
         var sampleUser = {
-            username: user,
+            email: email,
             password: pass,
             firstname: name,
             lastname: lname,
             unlocked_themes: [],
-            skill_list: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            credits: 0
+            credits: 0,
+            skill_list: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         }
         dbo.collection("users").insertOne(sampleUser, function(err, res) {
             if (err) throw err;
@@ -43,7 +43,7 @@ async function checkUser(u, p, response) {
     await client.connect(err => {
         var temp = null;
         var dbo = client.db("eTutor");
-        dbo.collection("users").findOne({username: u, password: p}, function(err, res) {
+        dbo.collection("users").findOne({email: u, password: p}, function(err, res) {
             if (err) throw err;
             if (res == null || res == undefined) {
                 userResult.found = false;
@@ -52,7 +52,7 @@ async function checkUser(u, p, response) {
                 userResult.found = true;
                 console.log("user found");
                 temp = {
-                    email: res.username,
+                    email: res.email,
                     firstname: res.firstname,
                     lastname: res.lastname,
                     credits: res.credits,
@@ -139,15 +139,38 @@ app.post('/module', jsonParser, function(req, res) {
 
 app.post('/addskill', jsonParser, function(req,res){
     console.log(req.body);
-    addTopicSkill(req.body.email, req.body.topic_index);
+    addTopicSkill(req.body.email, req.body.skill_list);
 
 })
+
 
 app.post('/subskill', jsonParser, function(req,res){
     console.log(req.body);
-    subTopicSkill(req.body.email, req.body.topic_index);
+    subTopicSkill(req.body.email, req.body.skill_list);
 
 })
+
+app.post('/personalizedpractice', jsonParser, function(req,res){
+    console.log(req.body);
+    findPersonalizedQuestion(req.body.topic, res)
+
+})
+
+async function findPersonalizedQuestion(t, response) {
+    await client.connect(err => {
+        client.db("eTutor").collection("questions").find({topic:t}).toArray(function(err, res) {
+            if (err) throw err;
+            if (res == null || res == undefined) {
+                console.log("no personalized questions found");
+            } else {
+                console.log("personalized questions found");
+                console.log(res);
+            }
+            response.status(200).send(JSON.stringify(res))
+            client.close();
+        });
+    })
+}
 
 var server = app.listen(8081, function () {
     var host = server.address().address
@@ -160,12 +183,13 @@ app.post('/exercisemodule', jsonParser, function(req,res){
     updateUserCredits(req.body.email, req.body.credits);
 })
 
-function updateUserCredits(email, credits) {
-    client.connect(err => {
+async function updateUserCredits(email, credits) {
+    await client.connect(err => {
         var dbo = client.db("eTutor");
-        dbo.collection("users").updateOne({email: email}, {$set: {credits: credits}}, function(err, res) {
+        dbo.collection("users").updateOne({"email": email}, {$set: {"credits": credits}}, function(err, res) {
             if (err) throw err;
             console.log("user credits updated");
+            console.log(res);
             client.close();
         });
     })
@@ -186,7 +210,7 @@ async function subTopicSkill(email, skill_list) {
         var dbo = client.db("eTutor");
         dbo.collection("users").updateOne({email: email}, {$set: {skill_list: skill_list}}, function(err, res) {
             if (err) throw err;
-            console.log("added to user skill");
+            console.log("subtracted from user skill");
             client.close();
         });
     })

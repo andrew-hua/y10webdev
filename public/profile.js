@@ -1,4 +1,27 @@
-
+const topics = [
+    "Arithmetic",
+    "Fractions, Decimals, and Percents",
+    "Math with Money",
+    "Integers",
+    "Perfects Squares and Square Roots",
+    "The Metric System",
+    "Data Analysis",
+    "Probability",
+    "2D Geometry",
+    "Proportions",
+    "Algebra",
+    "Simple and Compound Interest",
+    "The Coordinate System",
+    "More Advanced Algebra",
+    "More Advanced Geometry",
+    "Problem Solving Techniques",
+    "Tips for the Math Kangaroo",
+    "Tips for the AMC contest series",
+    "Trigonometry",
+    "Quadratics"
+  ];
+var strength = [];
+var weak = [];
 function getUserData() {
     if (sessionStorage.getItem('user') != null) {
         console.log(sessionStorage.getItem('user'));
@@ -44,5 +67,71 @@ function userLogout() {
     location.reload();
 }
 
+function displaySkills() {
+    let user = JSON.parse(sessionStorage.getItem("user"));
+    console.log(user)
+
+    let skill = user.skill_list;
+    console.log(skill)
+    if (user != null){
+        strength = []
+        weak = []
+        for(var i = 0; i<20; i++){
+            if (skill[i] >= 5){
+                const temp = document.createElement("p");
+                temp.innerHTML = topics[i]
+                document.getElementById("strengthcontainer").appendChild(temp);
+                strength.push(topics[i]);
+            }
+            else if (skill[i] <= -5){
+                const temp = document.createElement("p");
+                temp.innerHTML = topics[i]
+                document.getElementById("weakcontainer").appendChild(temp);
+                weak.push(topics[i]);
+            }
+        }
+        if (strength.length == 0){
+            const temp = document.createElement("p");
+            temp.innerHTML = "You are not strong in any topics"
+            document.getElementById("strengthcontainer").appendChild(temp);
+        }
+        if (weak.length == 0){
+            const temp = document.createElement("p");
+            temp.innerHTML = "You are not weak in any topics"
+            document.getElementById("weakcontainer").appendChild(temp);
+            document.getElementById("ppractice").disabled = true;
+        }
+        console.log(strength)
+        console.log(weak)
+    }
+}
+var personalizedQuestions = [];
+function personalizedPractice(subjects) {
+    console.log(subjects);
+    for(var i = 0; i<subjects.length; i++){
+        console.log(subjects[i]);
+        const url = "http://localhost:8081/personalizedpractice";
+        var temp = {
+            // list of weak topics
+          topic: subjects[i]
+        }
+        // send to rest api
+        fetch(url, {
+          method: 'POST',
+          body: JSON.stringify(temp),
+          headers: { "Content-type": "application/json" }
+        }).then(response => response.json())
+          .then(personalizedQuestions = data => personalizedQuestions.concat(data))
+    }
+    window.location.replace("exercisemodule.html");
+
+}
+
+
+document.getElementById("ppractice").addEventListener("click", function (e) {
+    personalizedPractice(weak);
+  })
+
+displaySkills();
 getUserData()
 confirmUser()
