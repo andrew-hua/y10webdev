@@ -183,19 +183,18 @@ app.post('/exercisemodule', jsonParser, function(req,res){
     updateUserCredits(req.body.email, req.body.credits);
 })
 
-async function updateUserCredits(email, credits) {
-    await client.connect(err => {
+function updateUserCredits(email, credits) {
+    client.connect(err => {
         var dbo = client.db("eTutor");
         dbo.collection("users").updateOne({"email": email}, {$set: {"credits": credits}}, function(err, res) {
             if (err) throw err;
             console.log("user credits updated");
             console.log(res);
-            client.close();
         });
     })
 }
-async function addTopicSkill(email, skill_list) {
-    await client.connect(err => {
+function addTopicSkill(email, skill_list) {
+    client.connect(err => {
         var dbo = client.db("eTutor");
         dbo.collection("users").updateOne({email: email}, {$set: {skill_list: skill_list}}, function(err, res) {
             if (err) throw err;
@@ -205,8 +204,8 @@ async function addTopicSkill(email, skill_list) {
     })
 }
 
-async function subTopicSkill(email, skill_list) {
-    await client.connect(err => {
+function subTopicSkill(email, skill_list) {
+    client.connect(err => {
         var dbo = client.db("eTutor");
         dbo.collection("users").updateOne({email: email}, {$set: {skill_list: skill_list}}, function(err, res) {
             if (err) throw err;

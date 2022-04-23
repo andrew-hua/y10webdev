@@ -138,16 +138,27 @@ function subSkill(skill) {
 
 
 function nextQuestion(value) {
-  const url = "http://localhost:8081/module"
-  var temp = {
-    topic: value
+  if (sessionStorage.getItem('personalizedQuestions') == null) {
+    const url = "http://localhost:8081/module"
+    var temp = {
+      topic: value
+    }
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(temp),
+      headers: { "Content-type": "application/json" }
+    }).then(response => response.json())
+      .then(data => displayQuestion(data))
   }
-  fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(temp),
-    headers: { "Content-type": "application/json" }
-  }).then(response => response.json())
-    .then(data => displayQuestion(data))
+  //there are personalized questions available, do not show default topic questions
+  else {
+    personalizedQuestions = JSON.parse(sessionStorage.getItem('personalizedQuestions'));
+    console.log(personalizedQuestions);
+    for (var i = 0; i < personalizedQuestions.length; i++) {
+      console.log(personalizedQuestions[i]);
+    }
+    displayQuestion(personalizedQuestions);
+  }
 }
 
 
@@ -173,6 +184,7 @@ function displayQuestion(val) {
   questionAnswer = a.answer;
 
   //clean up and change question
+  document.getElementById("topicHeader").innerHTML = a.topic;
   document.getElementById("questionTitle").innerHTML = a.title;
   document.getElementById("questionQuestion").innerHTML = a.question;
   document.getElementById("questionSolution").innerHTML = a.solution;

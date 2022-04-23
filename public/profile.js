@@ -106,7 +106,7 @@ function displaySkills() {
     }
 }
 var personalizedQuestions = [];
-function personalizedPractice(subjects) {
+async function personalizedPractice(subjects) {
     console.log(subjects);
     for(var i = 0; i<subjects.length; i++){
         console.log(subjects[i]);
@@ -115,16 +115,25 @@ function personalizedPractice(subjects) {
             // list of weak topics
           topic: subjects[i]
         }
-        // send to rest api
-        fetch(url, {
+        // send to api
+        await fetch(url, {
           method: 'POST',
           body: JSON.stringify(temp),
           headers: { "Content-type": "application/json" }
         }).then(response => response.json())
-          .then(personalizedQuestions = data => personalizedQuestions.concat(data))
+          .then(data => addQuestionsPersonalizedList(data))
     }
+    for(var i =0; i<personalizedQuestions.length; i++){
+        console.log(personalizedQuestions[i]);
+    }
+    sessionStorage.setItem("personalizedQuestions", JSON.stringify(personalizedQuestions));
+    console.log(personalizedQuestions);
     window.location.replace("exercisemodule.html");
 
+}
+
+function addQuestionsPersonalizedList(temp){
+    personalizedQuestions = personalizedQuestions.concat(temp);
 }
 
 
